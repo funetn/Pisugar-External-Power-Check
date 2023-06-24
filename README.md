@@ -11,9 +11,12 @@ Solution - Purchased the PISUGAR 3 and started to figure out how to implement my
 This is not the most elegant means to do this but with my limited programming skills seems to be functional and might provide a basis for other's projects and to improve upon.
 
 Crontab entry:
+
 */30 * * * *   /usr/bin/python /volumio/pisugar_power_check.py
 
 @reboot       /usr/bin/python /volumio/pisugar_power_check.py
+
+
 
 Possible improvements:
     * Use the PISUGAR RTC to run shutdown after calculating current time + shut off delay (currently scraching head on this option - need to store the current time + shut delay in a file and read this and determine if it's time to shutdown??) vs. using the SLEEP function (which keeps the current script in a suspended state and another instance will be executed). This would allow the Python script to execute without SLEEPING, yet still check if it's time to shutdown.  Not sure if really that important or not.
