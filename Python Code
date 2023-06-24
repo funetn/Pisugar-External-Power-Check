@@ -1,0 +1,76 @@
+#!/usr/bin/env python
+import smbus
+import math
+import time
+import logging
+import os
+
+# sudo i2cget -y 1 0x57 0x02
+# bus number = 1
+# Chip_Add = 0x57
+# Data_Add = 0x02
+
+# configure the logging file/format
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s - %(levelname)s: %(message)s",
+    datefmt='%Y.%m.%d %H:%M:%S', 
+    filename="/volumio/pisugar_power_check.log"
+    )
+
+logging.info('Checking power configuration')
+
+# define the I2C bus (since only 1 I2C device it is "1"
+MyBus = smbus.SMBus(1) 
+
+# get the I2C data from PISUGAR address for power connection flag
+ReadData = MyBus.read_byte_data(0x57,0x02)
+
+# Code to convert decimal to 8 bits binary
+res = format(ReadData, '08b')
+# Code to convert hext to binary - not using since ReadData in returned in decimal
+# res = "{0:08b}".format(int(ReadData, 10))  i2cget -y 1 0x57 0x2 returns hex value
+
+# Get the high bit from the result
+res = int(res[0])  # convert string result to integer type
+
+logging.info('Power Register is %s', res)
+
+# check if power is connected or not based on 0 or 1 (0 no, 1 yes)
+if not res:
+        logging.info('Power source NOT connected')
+        logging.info('Waiting 29 mins till shutting down')
+        # check if "nopower" control file exists - if so we can quit since already waiting x mins
+        if os.path.isfile('/volumio/pisugar_power_check_nopower.txt'):
+                logging.info('pisugar_power_check_nopower.txt found - quit script')
+                quit() 
+        else:
+                # check if "power" file exists if so rename it to "nopower" as control as been passed to UPS
+                if os.path.isfile('/volumio/pisugar_power_check_power.txt'):
+                        logging.info('Rename control file from power to nopower')
+                        os.rename('/volumio/pisugar_power_check_power.txt', '/volumio/pisugar_power_check_nopower.txt')
+                # time to sleep for 29 minutes
+                time.sleep(1760)  # wait 29 mins -- in seconds - just before cron runs again
+                # check for power connection one more time before shutting down
+                ReadData = MyBus.read_byte_data(0x57,0x02)
+                res = format(ReadData,'08b')
+                res = int(res[0])
+                if not res:   # shutdown Volumio as power as not been reconnected during the sleep period
+                        # reset the control file
+                        logging.info('Resetting power check control file')
+                        os.rename('/volumio/pisugar_power_check_nopower.txt', '/volumio/pisugar_power_check_power.txt')
+                        logging.info("Shutting down now")
+                        os.system("sudo shutdown now -h")
+                else:
+                        # power has been reconnected during the waiting period so reset control file
+                        logging.info('Shutdown cancelled - power reconnected')
+                        if os.path.isfile('/volumio/pisugar_power_check_nopower.txt'):
+                                logging.info('rename control file from nopower to power')
+                                os.rename('/volumio/pisugar_power_check_nopower.txt', '/volumio/pisugar_power_check_power.txt')
+else:
+        # PISUGAR has external power connected
+        logging.info('Power source connected')
+        # check if control file is in the wrong state...if so changed to "power" name
+        if os.path.isfile('/volumio/pisugar_power_check_nopower.txt'):
+                logging.info('rename control file from nopower to power')
+                os.rename('/volumio/pisugar_power_check_nopower.txt', '/volumio/pisugar_power_check_power.txt')
