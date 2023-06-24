@@ -12,12 +12,14 @@ Solution - Purchased the PISUGAR 3 and started to figure out how to implement my
 
 This is not the most elegant means to do this but with my limited programming skills seems to be functional and might provide a basis for other's projects and to improve upon.
 
-Crontab entry:
+Manual Configurations:
+1) Crontab entry:
 
 */30 * * * *   /usr/bin/python /volumio/pisugar_power_check.py
 
 @reboot       /usr/bin/python /volumio/pisugar_power_check.py
 
+2) Manually create a file called 'pisugar_power_check.power.txt' and put in the folder that you have the code referencing (in my case /volumio folder).  I tossed the Python script in the /volumio folder also since VOLUMIO is installed as a full image to the SD card so I didn't think it would matter where I placed it since it the system (SD card) needs to be rebuild the entire SD card will be overwritten.
 
 
 Possible improvements:
@@ -27,6 +29,7 @@ Possible improvements:
     * Write a byte to an open I2C register and read this to know if I'm currently waiting to shutdown down or not (vs. using a file/flock)
 
 I was unable to find any code that provided the solution to my issue so hope this provides someone with some insight to resolve a similiar issue.
+
 
 The code could be streamlined alot probably, such as using variables for the power/nopower filename, subroutines, etc.. I do realize the value of good programming practices (of which I utilized almost none here!) such as using variables for such things to keep things easy to modify without updating code in multiple places or subroutines vs. duplicate code.
 
