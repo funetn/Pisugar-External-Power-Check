@@ -6,6 +6,8 @@ Summary of the issue: I'm running VOLUMIO (media player) in my vehicle with a PI
 
 My first thought was to hard wire the RPi0W to the vehicle's battery then have a GPIO pin get pulled HIGH from the voltage from a secondary AUX USB plug (using an optical relay) and based on this issue a shutdown command to the RPi0W after x minutes (i.e 30 mins).  The RPi0W would still have a UPS connected to it to maintain power and bridge the fluxuation of power when restarting the vehicle.  Fortuntately in my timeframe of thinking how to resolve the issue PISUGAR came out with the PISUGAR 3 (or I just ran across it!).  The PISUGAR 3 for the RPi0 has a flag/bit that can be read which lets the user know if the UPS has external power connected to it or not.  Based on this "feature" I purcahsed the PISUGAR 3 (not the pro version since I'm using for a RPi0W).
 
+PiSugar 3 Github page - https://github.com/PiSugar/PiSugar/wiki/PiSugar-3-Series#rtc-on-board
+
 Solution - Purchased the PISUGAR 3 and started to figure out how to implement my x minutes delay for shutting down the RPi0W via the "connected power" flag.  This is the code that I came up with that works.
 
 This is not the most elegant means to do this but with my limited programming skills seems to be functional and might provide a basis for other's projects and to improve upon.
