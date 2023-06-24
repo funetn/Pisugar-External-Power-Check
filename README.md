@@ -12,6 +12,7 @@ This is not the most elegant means to do this but with my limited programming sk
 
 Crontab entry:
 */30 * * * *   /usr/bin/python /volumio/pisugar_power_check.py
+
 @reboot       /usr/bin/python /volumio/pisugar_power_check.py
 
 Possible improvements:
