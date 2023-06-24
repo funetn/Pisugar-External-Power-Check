@@ -11,10 +11,7 @@ Solution - Purchased the PISUGAR 3 and started to figure out how to implement my
 This is not the most elegant means to do this but with my limited programming skills seems to be functional and might provide a basis for other's projects and to improve upon.
 
 Crontab entry:
-# run script every 5 minutes
 */30 * * * *   /usr/bin/python /volumio/pisugar_power_check.py
-
-# run script after system (re)boot
 @reboot       /usr/bin/python /volumio/pisugar_power_check.py
 
 Possible improvements:
