@@ -6,9 +6,9 @@ import logging
 import os
 
 # sudo i2cget -y 1 0x57 0x02
-# bus number = 1
-# Chip_Add = 0x57
-# Data_Add = 0x02
+bus_number = 1
+chip_add = 0x57
+data_add = 0x02
 
 # configure the logging file/format
 logging.basicConfig(
@@ -21,18 +21,18 @@ logging.basicConfig(
 logging.info('Checking power configuration')
 
 # define the I2C bus (since only 1 I2C device it is "1"
-MyBus = smbus.SMBus(1) 
+MyBus = smbus.SMBus(bus_number) 
 
 # get the I2C data from PISUGAR address for power connection flag
-ReadData = MyBus.read_byte_data(0x57,0x02)
+ReadData = MyBus.read_byte_data(chip_add,data_add)
 
 # Code to convert decimal to 8 bits binary
 res = format(ReadData, '08b')
 # Code to convert hext to binary - not using since ReadData in returned in decimal
 # res = "{0:08b}".format(int(ReadData, 10))  i2cget -y 1 0x57 0x2 returns hex value
 
-# Get the high bit from the result
-res = int(res[0])  # convert string result to integer type
+# Get the high bit from the result and convert the string to integer type
+res = int(res[0])
 
 logging.info('Power Register is %s', res)
 
@@ -52,7 +52,7 @@ if not res:
                 # time to sleep for 29 minutes
                 time.sleep(1760)  # wait 29 mins -- in seconds - just before cron runs again
                 # check for power connection one more time before shutting down
-                ReadData = MyBus.read_byte_data(0x57,0x02)
+                ReadData = MyBus.read_byte_data(chip_add,data_add)
                 res = format(ReadData,'08b')
                 res = int(res[0])
                 if not res:   # shutdown Volumio as power as not been reconnected during the sleep period
